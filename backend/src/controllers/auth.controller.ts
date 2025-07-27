@@ -116,7 +116,9 @@ export const updateUserProfile = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Profile picture is required" });
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+      folder: "pingio/profile_pics",
+    });
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       {

@@ -49,7 +49,9 @@ export const sendMessage = async (req: Request, res: Response) => {
       "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 
     if (image) {
-      const uploadResponse = await cloudinary.uploader.upload(image);
+      const uploadResponse = await cloudinary.uploader.upload(image, {
+        folder: "pingio/messages",
+      });
       imageUrl = uploadResponse.secure_url;
     }
 
