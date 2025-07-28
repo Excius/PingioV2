@@ -5,6 +5,8 @@ import Navbar from "./components/Navbar";
 import { useAuthCheckQuery } from "./redux/services/authApi";
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
+import { useSelector } from "react-redux";
+import type { RootState } from "./redux/store";
 
 const HomePage = React.lazy(() => import("./pages/HomePage"));
 const SignUpPage = React.lazy(() => import("./pages/SignUpPage"));
@@ -15,6 +17,8 @@ const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
 function App() {
   const { data, isLoading } = useAuthCheckQuery({});
 
+  const theme = useSelector((state: RootState) => state.theme.mode);
+
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-screen">
@@ -23,7 +27,7 @@ function App() {
     );
 
   return (
-    <div>
+    <div data-theme={theme}>
       <Navbar />
       <Routes>
         <Route
