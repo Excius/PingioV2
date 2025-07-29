@@ -8,7 +8,7 @@ let socket: Socket | null = null;
 export const connectSocket = async (userId: string) => {
   if (!userId || socket?.connected) return;
 
-  socket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:3000/", {
+  socket = io(import.meta.env.VITE_SOCKET_URL || "/", {
     query: { userId },
   });
   await socket.connect();
