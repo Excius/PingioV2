@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
-import { useAuthCheckQuery } from "./redux/services/authApi";
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
-import type { RootState } from "./redux/store";
+import { useAppDispatch, type RootState } from "./redux/store";
+import { checkAuth } from "./redux/auth/authThunks";
 
 const HomePage = React.lazy(() => import("./pages/HomePage"));
 const SignUpPage = React.lazy(() => import("./pages/SignUpPage"));
@@ -15,7 +15,16 @@ const SettingsPage = React.lazy(() => import("./pages/SettingsPage"));
 const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
 
 function App() {
-  const { data, isLoading } = useAuthCheckQuery({});
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
+  const data = useSelector((state: RootState) => state.auth.authUser);
+  const isLoading = useSelector(
+    (state: RootState) => state.auth.isCheckingAuth
+  );
 
   const theme = useSelector((state: RootState) => state.theme.mode);
 

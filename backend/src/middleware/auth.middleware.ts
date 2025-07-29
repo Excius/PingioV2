@@ -31,7 +31,7 @@ export const authorized = async (
     }
 
     const user = await User.findById((decoded as any).userId).select(
-      "-password"
+      "-password -__v"
     );
 
     if (!user) {

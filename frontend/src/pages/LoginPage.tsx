@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useAuthCheckQuery, useLoginMutation } from "../redux/services/authApi";
-import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, MessageSquare, Lock, EyeOff, Eye, Loader2 } from "lucide-react";
 import AuthImagePattern from "../components/AuthImagePattern";
+import { useAppDispatch, type RootState } from "../redux/store";
+import { checkAuth, login } from "../redux/auth/authThunks";
+import { useSelector } from "react-redux";
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,24 +13,22 @@ function LoginPage() {
     password: "",
   });
 
-  const [login, { data, error, isLoading }] = useLoginMutation();
-  const { refetch } = useAuthCheckQuery({});
+  const dispatch = useAppDispatch();
+  const data = useSelector((state: RootState) => state.auth.authUser);
+  const isLoading = useSelector((state: RootState) => state.auth.isLoggingIn);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (error) {
-      toast.error(error?.data?.message || "An error occurred");
-    }
     if (data) {
-      toast.success("Login successful!");
-      refetch();
-      navigate("/");
+      dispatch(checkAuth()).then(() => {
+        navigate("/");
+      });
     }
-  }, [error, data, navigate, refetch]);
+  }, [data, navigate, dispatch]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(formData);
+    await dispatch(login(formData));
   };
   return (
     <div className="h-screen grid lg:grid-cols-2">

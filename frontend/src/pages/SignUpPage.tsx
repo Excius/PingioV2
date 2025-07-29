@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  useAuthCheckQuery,
-  useSignupMutation,
-} from "../redux/services/authApi";
-import {
   Eye,
   EyeOff,
   Mail,
@@ -15,10 +11,13 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import AuthImagePattern from "../components/AuthImagePattern";
 import toast from "react-hot-toast";
+import { useAppDispatch, type RootState } from "../redux/store";
+import { checkAuth, signup } from "../redux/auth/authThunks";
+import { useSelector } from "react-redux";
 
 function SignUpPage() {
   const navigate = useNavigate();
-  const { refetch } = useAuthCheckQuery({});
+  const disaptch = useAppDispatch();
 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -27,18 +26,16 @@ function SignUpPage() {
     password: "",
   });
 
-  const [signup, { data, error, isLoading }] = useSignupMutation();
+  const data = useSelector((state: RootState) => state.auth.authUser);
+  const isLoading = useSelector((state: RootState) => state.auth.isSigningUp);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error?.data?.message || "An error occurred");
-    }
     if (data) {
-      toast.success("Account created successfully!");
-      refetch();
-      navigate("/");
+      disaptch(checkAuth()).then(() => {
+        navigate("/");
+      });
     }
-  }, [error, data, navigate, refetch]);
+  }, [data, navigate, disaptch]);
 
   const validateForm = () => {
     if (!formData.fullName.trim()) return toast.error("Full Name is required");
@@ -51,12 +48,12 @@ function SignUpPage() {
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const isValid = validateForm();
     if (isValid === true) {
-      signup(formData);
+      await disaptch(signup(formData));
     } else {
       return;
     }

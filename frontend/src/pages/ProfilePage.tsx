@@ -1,24 +1,17 @@
 import { Camera, Mail, User } from "lucide-react";
-import {
-  useAuthCheckQuery,
-  useUpdateProfileMutation,
-} from "../redux/services/authApi";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
+import { useAppDispatch, type RootState } from "../redux/store";
+import { useSelector } from "react-redux";
+import { checkAuth, updateProfile } from "../redux/auth/authThunks";
 
 function ProfilePage() {
-  const { data: authUser, error: authError, refetch } = useAuthCheckQuery({});
-  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
+  const disaptch = useAppDispatch();
+  const authUser = useSelector((state: RootState) => state.auth.authUser);
+  const isUpdating = useSelector(
+    (state: RootState) => state.auth.isUpdatigngProfile
+  );
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (authError) {
-      toast.error(
-        authError?.data?.message ||
-          "An error occurred while fetching profile data"
-      );
-    }
-  }, [authError]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -46,9 +39,9 @@ function ProfilePage() {
       setSelectedImg(base64Image);
 
       try {
-        await updateProfile({ profilePic: base64Image });
+        await disaptch(updateProfile({ profilePic: base64Image }));
         toast.success("Profile picture updated successfully!");
-        refetch();
+        disaptch(checkAuth());
       } catch (err) {
         toast.error("Failed to update profile picture");
         console.error("Profile update error:", err);
@@ -60,6 +53,8 @@ function ProfilePage() {
       toast.error("Failed to read the file");
     };
   };
+  if (!authUser) return;
+
   return (
     <div className="min-h-screen pt-20 bg-gradient-to-br from-base-100 to-base-200">
       <div className="max-w-4xl mx-auto p-4 py-8">

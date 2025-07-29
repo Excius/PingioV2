@@ -1,19 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
-import {
-  authApi,
-  useAuthCheckQuery,
-  useLogoutMutation,
-} from "../redux/services/authApi";
 import { LogOut, MessageSquare, Settings, User } from "lucide-react";
-import { useDispatch } from "react-redux";
-import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 import { memo } from "react";
+import { useAppDispatch, type RootState } from "../redux/store";
+import { checkAuth, logout } from "../redux/auth/authThunks";
 
 const Navbar = memo(() => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { data: authUser } = useAuthCheckQuery({});
-  const [logout] = useLogoutMutation();
+  const dispatch = useAppDispatch();
+  const authUser = useSelector((state: RootState) => state.auth.authUser);
   return (
     <header
       className="border-b border-base-300 fixed w-full top-0 z-40 
@@ -61,9 +56,8 @@ const Navbar = memo(() => {
                 <button
                   className="btn btn-sm btn-ghost gap-2 hover:bg-base-200 transition-colors text-error hover:text-error"
                   onClick={async () => {
-                    await logout({});
-                    toast.success("Logout successful!");
-                    dispatch(authApi.util.resetApiState());
+                    await dispatch(logout());
+                    await dispatch(checkAuth());
                     navigate("/");
                   }}
                 >

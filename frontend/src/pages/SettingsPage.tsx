@@ -1,8 +1,8 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { THEMES } from "../constants";
 import { setTheme } from "../redux/theme/themeSlice";
 import { Send } from "lucide-react";
-import type { RootState } from "../redux/store";
+import { useAppDispatch, type RootState } from "../redux/store";
 
 const PREVIEW_MESSAGES = [
   { id: 1, content: "Hey! How's it going?", isSent: false },
@@ -14,7 +14,7 @@ const PREVIEW_MESSAGES = [
 ];
 
 function SettingsPage() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const theme = useSelector((state: RootState) => state.theme.mode);
   return (
     <div className="h-screen container mx-auto px-4 pt-20 max-w-5xl">

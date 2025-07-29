@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Message from "../models/message.model.js";
 import cloudinary from "../lib/cloudinary.js";
 import User from "../models/user.model.js";
+import { getRecevicerSocketId, io } from "../lib/socker.js";
 
 export const getUsersForSidebar = async (req: Request, res: Response) => {
   try {
@@ -45,8 +46,7 @@ export const sendMessage = async (req: Request, res: Response) => {
     const { id: recieverId } = req.params;
     const senderId = req.user?._id;
 
-    let imageUrl =
-      "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+    let imageUrl;
 
     if (image) {
       const uploadResponse = await cloudinary.uploader.upload(image, {
@@ -63,6 +63,12 @@ export const sendMessage = async (req: Request, res: Response) => {
     });
 
     await newMessage.save();
+
+    const receiverSocketId = getRecevicerSocketId(recieverId);
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
 
     res.status(201).json(newMessage);
   } catch (error) {
