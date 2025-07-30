@@ -1,4 +1,4 @@
-import z, { email } from "zod";
+import z from "zod";
 import User from "../models/user.model.js";
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
@@ -49,6 +49,8 @@ export const signup = async (req: Request, res: Response) => {
         fullName: newUser.fullName,
         email: newUser.email,
         profilePic: newUser.profilePic,
+        createdAt: newUser.createdAt,
+        updatedAt: newUser.updatedAt,
       });
     } else {
       res.status(500).json({ message: "Failed to create user" });
@@ -87,6 +89,8 @@ export const login = async (req: Request, res: Response) => {
       fullName: user.fullName,
       email: user.email,
       profilePic: user.profilePic,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     });
   } catch (error) {
     console.error("Login error:", error);
